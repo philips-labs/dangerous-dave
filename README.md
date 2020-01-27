@@ -3,6 +3,7 @@ This is a NodeJS tool that receives bluetooth Beacon messages and prints them to
 
 ## Requirements 
 
+* OS X
 * NodeJS 6+
 
 ## Install
