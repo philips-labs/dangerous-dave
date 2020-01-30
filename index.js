@@ -39,19 +39,20 @@ function printBeacons() {
 
 // Set an Event handler for becons
 scanner.onadvertisement = (ad) => {
-    if (ad.id in beacons) {
-        beacons[ad.id].rssi = ad.rssi
-
-    } else if (ad.beaconType == "eddystoneUrl") {
+    if (!(ad.id in beacons)) {
         beacons[ad.id] = {
-            'txPower': ad.eddystoneUrl.txPower,
-            'rssi': ad.rssi
-        }
+            'rssi': ad.rssi,
+            'txPower': 0,
+            'instance': ''
+        };
+    }
+    if (ad.beaconType == "eddystoneUrl") {
+        beacons[ad.id].txPower = ad.eddystoneUrl.txPower;
+        beacons[ad.id].rssi = ad.rssi;
     } else if (ad.beaconType == "eddystoneUid") {
-        beacons[ad.id] = {
-            'txPower': ad.eddystoneUid.txPower,
-            'rssi': ad.rssi
-        }
+        beacons[ad.id].txPower = ad.eddystoneUid.txPower;
+        beacons[ad.id].rssi = ad.rssi;
+        beacons[ad.id].instance = ad.eddystoneUid.instance;
     }
     printBeacons();
 };
