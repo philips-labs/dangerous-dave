@@ -28,11 +28,11 @@ function calculateAccuracy(txPower, rssi) {
 
 function printBeacons() {
     var table = new AsciiTable();
-    table.setHeading('Beacon ID', 'Last RSSI', 'Estimated distance');
+    table.setHeading('Beacon ID', 'Instance', 'Last RSSI', 'Estimated distance');
     for (b in beacons) {
         if (beacons[b].txPower === 0) continue;
         let distance = calculateAccuracy(beacons[b].txPower, beacons[b].rssi)
-        table.addRow(b, beacons[b].rssi, `${distance.toFixed(2)}m`)
+        table.addRow(b, beacons[b].instance, beacons[b].rssi, `${distance.toFixed(2)}m`)
     }
     log(table.toString());
 }
@@ -43,7 +43,7 @@ scanner.onadvertisement = (ad) => {
         beacons[ad.id] = {
             'rssi': ad.rssi,
             'txPower': 0,
-            'instance': ''
+            'instance': '??'
         };
     }
     if (ad.beaconType == "eddystoneUrl") {
