@@ -47,6 +47,11 @@ scanner.onadvertisement = (ad) => {
             'txPower': ad.eddystoneUrl.txPower,
             'rssi': ad.rssi
         }
+    } else if (ad.beaconType == "eddystoneUid") {
+        beacons[ad.id] = {
+            'txPower': ad.eddystoneUid.txPower,
+            'rssi': ad.rssi
+        }
     }
     printBeacons();
 };
