@@ -1,5 +1,7 @@
 const AsciiTable = require('ascii-table');
+const hex2ascii = require('hex2ascii');
 const log = require('single-line-log').stdout;
+const trilateration = require('node-trilateration');
 const BeaconScanner = require('node-beacon-scanner');
 const scanner = new BeaconScanner();
 
@@ -29,30 +31,54 @@ function calculateAccuracy(txPower, rssi) {
 function printBeacons() {
     var table = new AsciiTable();
     table.setHeading('Beacon ID', 'Instance', 'Last RSSI', 'Estimated distance');
-    for (b in beacons) {
-        if (beacons[b].txPower === 0) continue;
-        let distance = calculateAccuracy(beacons[b].txPower, beacons[b].rssi)
-        table.addRow(b, beacons[b].instance, beacons[b].rssi, `${distance.toFixed(2)}m`)
+    if (Object.keys(beacons).length >= 3) {
+        let trilaterationBeacons = [];
+        for (b in beacons) {
+            if (beacons[b].txPower === 0) continue;
+            let distance = calculateAccuracy(beacons[b].txPower, beacons[b].rssi)
+            let beaconXY = beacons[b].instance.substr(1, beacons[b].instance.length - 2).split(',');
+            // console.log(beaconXY)
+            trilaterationBeacons.push({
+                x: parseFloat(beaconXY[0]),
+                y: parseFloat(beaconXY[1]),
+                distance: distance
+            });
+            table.addRow(b, beacons[b].instance, beacons[b].rssi, `${distance.toFixed(2)}m`)
+        }
+        let logLine = table.toString();
+        // console.log(trilaterationBeacons);
+        let pos = trilateration.calculate(trilaterationBeacons);
+        logLine += `\nMy Position: ${pos.x}, ${pos.y}`;
+        log(logLine);
+    } else {
+        console.log(`Not enough beacons!`);
     }
-    log(table.toString());
 }
 
 // Set an Event handler for becons
 scanner.onadvertisement = (ad) => {
-    if (!(ad.id in beacons)) {
-        beacons[ad.id] = {
-            'rssi': ad.rssi,
-            'txPower': 0,
-            'instance': '??'
-        };
-    }
-    if (ad.beaconType == "eddystoneUrl") {
-        beacons[ad.id].txPower = ad.eddystoneUrl.txPower;
-        beacons[ad.id].rssi = ad.rssi;
-    } else if (ad.beaconType == "eddystoneUid") {
+    // Only pick up the 
+    // if (!(ad.id in beacons)) {
+    //     beacons[ad.id] = {
+    //         'rssi': ad.rssi,
+    //         'txPower': 0,
+    //         'instance': '??'
+    //     };
+    // }
+    // if (ad.beaconType == "eddystoneUrl") {
+    //     beacons[ad.id].txPower = ad.eddystoneUrl.txPower;
+    //     beacons[ad.id].rssi = ad.rssi;
+    // } else 
+    if (ad.beaconType == "eddystoneUid") {
+        if (!ad.eddystoneUid.instance.startsWith("0028")) return;
+        if (!(ad.id in beacons)) {
+            beacons[ad.id] = {};
+        }
         beacons[ad.id].txPower = ad.eddystoneUid.txPower;
         beacons[ad.id].rssi = ad.rssi;
-        beacons[ad.id].instance = ad.eddystoneUid.instance;
+        beacons[ad.id].instance = hex2ascii(ad.eddystoneUid.instance);
+    } else {
+        return;
     }
     printBeacons();
 };
@@ -63,3 +89,6 @@ scanner.startScan().then(() => {
 }).catch((error) => {
     console.error(error);
 });
+
+// var s = '0028362C3029';
+// console.log(hex2ascii(s));

@@ -6,7 +6,9 @@
   "dependencies": {
     "@abandonware/noble": "^1.9.2-5",
     "ascii-table": "^0.0.9",
+    "hex2ascii": "^0.0.3",
     "node-beacon-scanner": "^0.2.2",
+    "node-trilateration": "^1.0.0",
     "single-line-log": "^1.1.2"
   }
 }

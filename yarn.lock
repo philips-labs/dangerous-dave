@@ -215,6 +215,11 @@ has-unicode@^2.0.0:
   resolved "https://registry.yarnpkg.com/has-unicode/-/has-unicode-2.0.1.tgz#e0e6fe6a28cf51138855e086d1691e771de2a8b9"
   integrity sha1-4Ob+aijPUROIVeCG0Wkedx3iqLk=
 
+hex2ascii@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/hex2ascii/-/hex2ascii-0.0.3.tgz#2dab08bad5a34430dd5cc751271eac4a90eae8fa"
+  integrity sha1-LasIutWjRDDdXMdRJx6sSpDq6Po=
+
 iconv-lite@^0.4.4:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
@@ -376,6 +381,11 @@ node-pre-gyp@^0.13.0:
     rimraf "^2.6.1"
     semver "^5.3.0"
     tar "^4"
+
+node-trilateration@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/node-trilateration/-/node-trilateration-1.0.0.tgz#35b87a1ca2b049c444c58b6aee8b7ffb5c6eca1e"
+  integrity sha1-Nbh6HKKwScRExYtq7ot/+1xuyh4=
 
 noop-logger@^0.1.1:
   version "0.1.1"
