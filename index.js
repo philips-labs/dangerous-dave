@@ -30,6 +30,7 @@ function printBeacons() {
     var table = new AsciiTable();
     table.setHeading('Beacon ID', 'Last RSSI', 'Estimated distance');
     for (b in beacons) {
+        if (beacons[b].txPower === 0) continue;
         let distance = calculateAccuracy(beacons[b].txPower, beacons[b].rssi)
         table.addRow(b, beacons[b].rssi, `${distance.toFixed(2)}m`)
     }
