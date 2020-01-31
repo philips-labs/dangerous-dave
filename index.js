@@ -3,6 +3,7 @@ const hex2ascii = require('hex2ascii');
 const log = require('single-line-log').stdout;
 const trilateration = require('node-trilateration');
 const BeaconScanner = require('node-beacon-scanner');
+const CircularBuffer = require("circular-buffer");
 const scanner = new BeaconScanner();
 
 const beacons = {};
@@ -30,20 +31,24 @@ function calculateAccuracy(txPower, rssi) {
 
 function printBeacons() {
     var table = new AsciiTable();
-    table.setHeading('Beacon ID', 'Instance', 'Last RSSI', 'Estimated distance');
+    table.setHeading('Beacon ID', 'Instance', 'Average RSSI', 'RSSI', 'TxPower', 'Estimated distance');
     if (Object.keys(beacons).length >= 3) {
         let trilaterationBeacons = [];
         for (b in beacons) {
             if (beacons[b].txPower === 0) continue;
-            let distance = calculateAccuracy(beacons[b].txPower, beacons[b].rssi)
-            let beaconXY = beacons[b].instance.substr(1, beacons[b].instance.length - 2).split(',');
-            // console.log(beaconXY)
-            trilaterationBeacons.push({
-                x: parseFloat(beaconXY[0]),
-                y: parseFloat(beaconXY[1]),
-                distance: distance
-            });
-            table.addRow(b, beacons[b].instance, beacons[b].rssi, `${distance.toFixed(2)}m`)
+            let rssiArray = beacons[b].rssi.toarray();
+            let averageRssi = rssiArray.reduce((a, b) => a + b, 0) / rssiArray.length;
+            let distance = calculateAccuracy(beacons[b].txPower, averageRssi)
+            if (beacons[b].instance.startsWith('(')) {
+                let beaconXY = beacons[b].instance.substr(1, beacons[b].instance.length - 2).split(',');
+                // console.log(beaconXY)
+                trilaterationBeacons.push({
+                    x: parseFloat(beaconXY[0]),
+                    y: parseFloat(beaconXY[1]),
+                    distance: distance
+                });
+            }
+            table.addRow(b, beacons[b].instance, `${averageRssi.toFixed(2)}`, beacons[b].rssi.toarray(), beacons[b].txPower, `${distance.toFixed(2)}m`)
         }
         let logLine = table.toString();
         // console.log(trilaterationBeacons);
@@ -58,28 +63,29 @@ function printBeacons() {
 // Set an Event handler for becons
 scanner.onadvertisement = (ad) => {
     // Only pick up the 
-    // if (!(ad.id in beacons)) {
-    //     beacons[ad.id] = {
-    //         'rssi': ad.rssi,
-    //         'txPower': 0,
-    //         'instance': '??'
-    //     };
-    // }
-    // if (ad.beaconType == "eddystoneUrl") {
-    //     beacons[ad.id].txPower = ad.eddystoneUrl.txPower;
-    //     beacons[ad.id].rssi = ad.rssi;
-    // } else 
-    if (ad.beaconType == "eddystoneUid") {
-        if (!ad.eddystoneUid.instance.startsWith("0028")) return;
-        if (!(ad.id in beacons)) {
-            beacons[ad.id] = {};
-        }
-        beacons[ad.id].txPower = ad.eddystoneUid.txPower;
-        beacons[ad.id].rssi = ad.rssi;
-        beacons[ad.id].instance = hex2ascii(ad.eddystoneUid.instance);
-    } else {
-        return;
+    if (!(ad.id in beacons)) {
+        beacons[ad.id] = {
+            'rssi': new CircularBuffer(10),
+            'txPower': 0,
+            'instance': '??'
+        };
     }
+    if (ad.beaconType == "eddystoneUrl") {
+        beacons[ad.id].txPower = ad.eddystoneUrl.txPower;
+        beacons[ad.id].rssi.push(ad.rssi);
+    } else
+        if (ad.beaconType == "eddystoneUid") {
+            // if (!ad.eddystoneUid.instance.startsWith("0028")) return;
+            // console.log(ad)
+            // if (!(ad.id in beacons)) {
+            //     beacons[ad.id] = { 'rssi': new CircularBuffer(10) };
+            // }
+            beacons[ad.id].txPower = ad.eddystoneUid.txPower;
+            beacons[ad.id].rssi.push(ad.rssi);
+            beacons[ad.id].instance = hex2ascii(ad.eddystoneUid.instance);
+        } else {
+            return;
+        }
     printBeacons();
 };
 
