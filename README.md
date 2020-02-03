@@ -1,6 +1,8 @@
 # Dangerous Dave
 Dangerous Dave sometimes gets ill. This does not mean he stopped becoming dangerous!!
 
+> :warning: **This projects is part of an hackaton and by no means complete!** Don't use this for production!
+
 ## Purpose
 This application will assist the care-giver for Dangerous Dave to detect the Dave becoming Dangerous!
 
