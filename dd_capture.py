@@ -2,6 +2,9 @@ import cv2
 import Algorithmia
 import PySimpleGUI as sg
 
+# Authenticate with Algorithmia API key
+apiKey = "siml7JQGhnZ+g4QrXf07OdzK7xJ1"
+
 input = {
   "image": "data://deeplearning/example_data/elon_musk.jpg",
   "numResults": 7
@@ -14,9 +17,9 @@ webcam = cv2.VideoCapture(0)
 while True:
     try:
         check, frame = webcam.read()
-        cv2.imwrite(filename='C:/temp/saved_img.jpg', img=frame)
+        cv2.imwrite(filename='/tmp/saved_img.jpg', img=frame)
         #webcam.release()
-        img_new = cv2.imread('C:/temp/saved_img.jpg', cv2.IMREAD_ANYCOLOR)
+        img_new = cv2.imread('/tmp/saved_img.jpg', cv2.IMREAD_ANYCOLOR)
         #cv2.imshow("Captured Image", img_new)
         
         cv2.waitKey(500)
@@ -24,9 +27,9 @@ while True:
         event, values = window.Read(timeout=20, timeout_key='timeout')      # get events for the window with 20ms max wait
         if event is None:  break                                            # if user closed window, quit
  
-        client = Algorithmia.client('simjdYY3AkqhyUe0TB0gdlefRkF1')
+        client = Algorithmia.client(apiKey)
         foo = client.dir("data://.my/data")
-        foo.file("saved_img.jpg").putFile("C:/temp/saved_img.jpg")
+        foo.file("saved_img.jpg").putFile("/tmp/saved_img.jpg")
         algo = client.algo('deeplearning/EmotionRecognitionCNNMBP/1.0.1')
         algo.set_options(timeout=3000) # optional
         input["image"] = "data://.my/data/saved_img.jpg";
