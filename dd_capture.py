@@ -3,7 +3,7 @@ import Algorithmia
 import PySimpleGUI as sg
 
 # Authenticate with Algorithmia API key
-apiKey = "siml7JQGhnZ+g4QrXf07OdzK7xJ1"
+apiKey = "fake key, put your key here"
 
 input = {
   "image": "data://deeplearning/example_data/elon_musk.jpg",
