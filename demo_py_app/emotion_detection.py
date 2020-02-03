@@ -1,8 +1,6 @@
 import cv2
 import Algorithmia
 import PySimpleGUI as sg
-import io
-from PIL import Image, ImageTk
 import threading
 import _thread
 
@@ -27,6 +25,7 @@ class Captured_frame():
             self.status = 'capture_mode'
         return self.health
 
+# Still not used
 class algorithmiaThread (threading.Thread):
    def __init__(self, threadID, name, frame):
       threading.Thread.__init__(self)
@@ -40,34 +39,6 @@ class algorithmiaThread (threading.Thread):
       init_algorithmia_byte(frame)
       # Free lock to release next thread
       # threadLock.release()
-
-def get_image_data(capture, first=False):
-    if (capture.isOpened()):
-        ret, frame = capture.read()
-    else:
-        return False, ''
-    #ret, frame = capture.read()
-    frame = cv2.flip(frame, 1)
-    cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-    img = Image.fromarray(cv2image)
-    if first:                     # tkinter is inactive the first time
-        bio = io.BytesIO()
-        img.save(bio, format="PNG")
-        del img
-        return ret, bio.getvalue()
-    return ret, ImageTk.PhotoImage(image=img)
-
-def get_img_data(f, maxsize=(1200, 850), first=False):
-    """Generate image data using PIL
-    """
-    img = Image.open(f)
-    img.thumbnail(maxsize)
-    if first:                     # tkinter is inactive the first time
-        bio = io.BytesIO()
-        img.save(bio, format="PNG")
-        del img
-        return bio.getvalue()
-    return ImageTk.PhotoImage(img)
 
 def init_algorithmia_byte(frame):
     client = Algorithmia.client(apiKey)
@@ -97,39 +68,6 @@ def init_algorithmia(image):
     print('call success\n' + str(res))
     return res
 
-def live_video3(cap):
-    global frame
-    # cap = cv2.VideoCapture(camera_port)
-    if (cap.isOpened()):
-        return cap.read()
-        ret, frameNow = cap.read()
-
-        if not ret:
-            cv2.waitKey(1)
-            return ''
-        else:
-            return frameNow
-            # cv2.imshow('Video', frameNow)
-            frame = frameNow
-            return cv2.imshow('Video', frameNow)
-        # if cv2.waitKey(75) & 0xFF == ord('q'):
-        #     break
-    # cap.release()
-    # cv2.destroyAllWindows()
-
-# Authenticate with Algorithmia API key
-apiKey = "siml7JQGhnZ+g4QrXf07OdzK7xJ1"
-
-input = {
-    "image": "data://deeplearning/example_data/elon_musk.jpg",
-    "numResults": 7
-}
-
-print("Emotion detector started!")
-
-test = True
-
-
 def algo_emo_api_get():
     global emo_result, persons, person, emotions, emotion, emotion_per, current_emotions
     show_res = ''
@@ -146,6 +84,12 @@ def algo_emo_api_get():
     print(show_res)
     window['-emo-'].update([show_res])
 
+# Authenticate with Algorithmia API key
+apiKey = "fakeKey_put_you_one"
+
+print("Emotion detector started!")
+
+test = True
 
 if test:
     # Initialize computer default camera, grab first frame
