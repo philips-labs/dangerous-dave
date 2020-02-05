@@ -1,0 +1,7 @@
+name: demo_py_app
+channels:
+    - conda-forge
+dependencies:
+    - pip:
+        - algorithmia
+    - pysimplegui
