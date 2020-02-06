@@ -6,11 +6,13 @@ You will need to enter your environment via a shell and run '`pip install algori
 We are using algorithmia from pip and pysimplegui and opencv packages
 ## Installation of project
 To use the environment, type
-
+```
 conda env create -f environment.yml
 conda activate demo_py_app
+```
 
 To update the environment when environment.yml is changed or packages are updated,
-
+```
 conda env update -f environment.yml
 conda activate demo_py_app
+```
